@@ -1,59 +1,62 @@
-const backendUrl = "http://localhost:3001";
+const BACKEND_ROOT_URL = 'http://localhost:3001';
+import { Todos } from './class/Todos.js';
 
-const todoList = document.getElementById("todo-list");
-const inputField = document.getElementById("todo-input");
+const todos = new Todos(BACKEND_ROOT_URL);
 
+const list = document.querySelector('ul');
+const input = document.querySelector('input');
 
+input.disabled = true;
 
-
-const getTasks = async () => {
-  try{
-    const response = await fetch(backendUrl)
-    const json = await response.json()
-    json.forEach(task => {
-      renderTask(task.description)
-    })
-    inputField.disabled = false
-  } catch (error) {
-    console.error(error)
-  }
-
-}
-const savetask = async (task) => {
-   try{
-    const response = await fetch(backendUrl +'/new', {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({description: task}),
-    })
-    return response.json();
-   } catch (error) {
-      console.error(error)
-    
-   }
+const renderTask = (task) => {
+    const li = document.createElement('li');
+    li.setAttribute('class', 'list-group-item');
+    li.innerHTML = task.getText(); 
+    list.appendChild(li);
 }
 
-const renderTask = (description) => {
-  const task = document.createElement("li");
-  task.textContent = description;
-  task.classList.add("todo-item");
-  todoList.appendChild(task);
-};
+const getTasks = () => {
+    todos.getTasks().then((tasks) => {
+        tasks.forEach(task => {
+            renderTask(task)
+        })
+        input.disabled = false;
+    }).catch ((error) =>{
+        alert(error)
+    })
+}
 
-
-
-document.getElementById("todo-input").addEventListener("keypress", function(event) {
-  // Check if the Enter key is pressed
-  if (event.key === "Enter") {
-    event.preventDefault();
-    const task = inputField.value.trim();
-    if (task !== "") {
-      savetask(task)
-      renderTask(task);
-      inputField.value = "";
+const saveTask = async (task) => {
+    try {
+        const response = await fetch(`${BACKEND_ROOT_URL}/new`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ description: task })
+        });
+        if (!response.ok) {
+            throw new Error('Failed to save task');
+        }
+        const data = await response.json();
+        renderTask(data);
+        input.value = '';
+    } catch (error) {
+        console.error(error);
     }
-  } 
+}
+
+getTasks();
+
+input.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const task = input.value.trim();
+        if (task !== '') {
+            todos.addTask(task).then((task) => {
+                renderTask(task)
+                input.value = '';
+            })
+        }    
+    }
 });
-getTasks()
