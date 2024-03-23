@@ -1,6 +1,7 @@
-.main-todo-div{
-    
-    width: 50%;
-    margin: auto;
-    margin-top:5%;
+h3{
+    margin: 1em 0;
+}
+
+form{
+    margin-bottom: 1em;
 }

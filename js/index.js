@@ -46,7 +46,7 @@ const saveTask = async (task) => {
     }
 }
 
-getTasks();
+
 
 input.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
@@ -60,3 +60,4 @@ input.addEventListener('keypress', (event) => {
         }    
     }
 });
+getTasks();
