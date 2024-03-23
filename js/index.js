@@ -6,7 +6,7 @@ const todos = new Todos(BACKEND_ROOT_URL);
 const list = document.querySelector('ul');
 const input = document.querySelector('input');
 
-input.disabled = true;
+// input.disabled = true;
 
 const renderTask = (task) => {
     const li = document.createElement('li');
