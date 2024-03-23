@@ -8,3 +8,6 @@ Content-Type: application/json
 {
     "description": "1 from Dipendra"
 }
+
+### Delete task
+DELETE http://localhost:3001/delete/12 HTTP/1.1

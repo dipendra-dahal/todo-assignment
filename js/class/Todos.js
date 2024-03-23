@@ -56,6 +56,27 @@ class Todos {
     this.#tasks.push(task);
     return task;
   };
+
+  #removeTaskFromArray = (id) => {
+    this.#tasks = this.#tasks.filter(task => task.id !== id);
+  };
+  removeTask = (id) => {
+    return new Promise(async (resolve, reject) => {
+      fetch(this.#backend_url + '/delete/' + id, {
+        method: 'DELETE'
+      })
+      .then((response) => response.json())
+      .then((json) => {
+        // Call the new private method to remove task from array
+        this.#removeTaskFromArray(id);
+        resolve(json.id);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+    });
+  };
+
 }
 
 export { Todos };
