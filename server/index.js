@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 const {Pool} = require('pg');
@@ -15,32 +16,32 @@ const pool = new Pool({
     port: 5432
 })
 
-app.get('/', (req, res) => {
-    pool.query('select *  from todos;', (error, result) => {
-        if(error) {
-            res.status(500).json({ error: error.message });
-        } else {
-            res.status(200).json(result.rows);
-        }
-    });
-    
+// Route to get all tasks
+app.get('/', async (req, res) => {
+    try {
+        const query = 'SELECT * FROM todos;';
+        const { rows } = await pool.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error retrieving tasks:', error);
+        res.status(200).json({ error: 'Internal Server Error' });
+    }
 });
 
-
+// Route to create a new task
 app.post('/new', (req, res) => {
-    const {task} = req.body;
-if (!task) {
-    return res.status(400).json({error:'task is required'});
-}
-    pool.query('INSERT INTO todos (task) VALUES ($1) RETURNING *', [task], (error, result) => {
-        if(error) {
-            res.status(500).json({ error: error.message });
-        } else {
-            res.status(200).json({id:result.rows[0].id});
+    const { description } = req.body;
+    if (!description) {
+        return res.status(400).json({ error: 'Description is required' });
+    }
+
+    pool.query('INSERT INTO todos (description) VALUES ($1) RETURNING  id', [description], (error, result) => {
+        if (error) {
+            return res.status(500).json({ error: error.message });
         }
+        res.status(200).json({ id: result.rows[0].id });
     });
 });
-
 
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
