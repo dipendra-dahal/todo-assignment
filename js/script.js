@@ -1,21 +1,59 @@
-const list = document.querySelector("ul");
-const input = document.querySelector("input");
+const backendUrl = "http://localhost:3001";
 
-input.addEventListener("keypress", (event) => {
+const todoList = document.getElementById("todo-list");
+const inputField = document.getElementById("todo-input");
+
+
+
+
+const getTasks = async () => {
+  try{
+    const response = await fetch(backendUrl)
+    const json = await response.json()
+    json.forEach(task => {
+      renderTask(task.description)
+    })
+    inputField.disabled = false
+  } catch (error) {
+    console.error(error)
+  }
+
+}
+const savetask = async (task) => {
+   try{
+    const response = await fetch(backendUrl +'/new', {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({description: task}),
+    })
+    return response.json();
+   } catch (error) {
+      console.error(error)
+    
+   }
+}
+
+const renderTask = (description) => {
+  const task = document.createElement("li");
+  task.textContent = description;
+  task.classList.add("todo-item");
+  todoList.appendChild(task);
+};
+
+
+
+document.getElementById("todo-input").addEventListener("keypress", function(event) {
+  // Check if the Enter key is pressed
   if (event.key === "Enter") {
     event.preventDefault();
-    const task = input.value.trim();
+    const task = inputField.value.trim();
     if (task !== "") {
-      
-      const li = document.createElement("li");
-      li.setAttribute("class", "list-group-item");
-      li.textContent = task;
-      // add css in the appended list as 80% width and align the list on left
-      li.style.width = "80%"
-      li.style.textAlign = "left";
-      list.appendChild(li);
-      input.value = "";
+      savetask(task)
+      renderTask(task);
+      inputField.value = "";
     }
-    console.log(list);
-  }
+  } 
 });
+getTasks()
