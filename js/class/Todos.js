@@ -35,7 +35,8 @@ class Todos {
         .then((response) => response.json())
         .then(
           (json) => {
-            resolve(this.#addToArray(json.id, json.description));
+            console.log(json)
+            resolve(this.#addToArray(json.id, text));
           },
           (error) => {
             reject(error);
